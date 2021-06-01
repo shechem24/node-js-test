@@ -1,6 +1,6 @@
 "use strict";
 
-const app = require("../app_02")
+const app = require("../app")
 
 const PORT = 3000;
 
