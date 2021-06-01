@@ -24,7 +24,17 @@ function login () {
     body: JSON.stringify(req),
   })
   .then((res) => res.json())
-  .then(console.log);
+  .then((res) => {
+    if (res.success) {
+      location.href = "/";
+    } else {
+      alert(res.msg);
+    }
+  })
+  .catch((err) => {
+    console.error(new Error("로그인 중 에러 발생"));  // 에러처리
+  })
+  // .then(console.log);
   //.then((res) => console.log(res)); 함수안에 동일한 것을 넘길때는 생략해서 위와같이 작성 가능           // res.json()은 promise형태로 옴 → 받기위해 .then 필요함
 
 };
