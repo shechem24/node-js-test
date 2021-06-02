@@ -16,9 +16,9 @@ const output = {
 };
 
 const process = {
-  login: (req, res) => {
+  login: async (req, res) => {
     const user = new User(req.body);  // 인스턴스 형태
-    const response = user.login();
+    const response = await user.login();
     // console.log(response);
     return res.json(response);
   },
