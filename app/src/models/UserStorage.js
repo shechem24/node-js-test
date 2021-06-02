@@ -17,10 +17,11 @@ class UserStorage {
         
     return userInfo;
   }
-  
-  // 은닉화 된 변수를 메소드로 전달 함
-  static getUsers(...fields) {
-    // const users = this.#users;
+
+  static #getUsers(data, isAll, fields) {
+    const users = JSON.parse(data);
+    if (isAll) return users;                // 모든 값 반환
+
     const newUsers = fields.reduce((newUsers, field) => {
       if (users.hasOwnProperty(field)) {
         newUsers[field] = users[field];
@@ -28,6 +29,17 @@ class UserStorage {
       return newUsers;
     }, {});
     return newUsers;
+
+  }
+
+  // 은닉화 된 변수를 메소드로 전달 함
+  static getUsers(isAll, ...fields) {
+    return fs               // 프로미스로 반환
+    .readFile("./src/databases/users.json")
+    .then((data) => {
+      return this.#getUsers(data, isAll, fields);
+    })
+    .catch(console.error);
   };
 
   static getUserInfo (id) {
@@ -39,12 +51,17 @@ class UserStorage {
     .catch(console.error);  // catch((err) => console.error(err)) 파라미터로 넘어온 변수를 실행시키는 함수로 똑같이 넘기는 경우 생략 가능
   };
 
-  static save(userInfo) {
-    // const users = this.#users;
+  static async save (userInfo) {
+    const users = await this.getUsers(true);  // true: 모든 데이터
+    if (users.id.includes(userInfo.id)) {
+      throw "이미 존재하는 아이디입니다.";    // 에러구문. 문자열 대신 Error("에러구문")으로 할 경우 object라는 이름으로 나옴
+    }
     users.id.push(userInfo.id);
     users.name.push(userInfo.name);
     users.psword.push(userInfo.psword);
-    return { success: true };
+    
+    fs.writeFile("./src/databases/users.json", JSON.stringify(users));
+    return { success: true};
   }
 };
 
