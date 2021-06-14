@@ -42,7 +42,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(morgan("common", { stream: accessLogStream }));   // dev: 개발 모드, stream: 데이터가 이동하는 연결 통로
 
 // winston & morgan
-app.use(morgan("tiny", { stream: logger.stream }));
+// app.use(morgan("tiny", { stream: logger.stream }));
 
 
 // "/"로 시작하는 주소들에서 미들웨어 home을 적용
