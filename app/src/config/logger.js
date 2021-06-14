@@ -15,11 +15,9 @@ const printLogFormat ={
     timestamp({
       format: "YYYY-MM-DD HH:mm:dd"
     }),
-    
-
-    // simple()
     // 콜백함수에서 사용하고 싶은 변수들을 오브젝트로 넘겨 줄 수 있음
     printFormat
+    // simple()
   ),
   console: combine(
     colorize(),
@@ -32,7 +30,6 @@ const opts = {
     filename: "access.log",
     dirname: "./logs",
     level: "info",                    // level: 출력할 단계 한계 지정
-    
     format: printLogFormat.file,
   }),
   console: new transports.Console({
@@ -49,20 +46,8 @@ if (process.env.NODE_ENV !== "production") {
   logger.add(opts.console);
 }
 
-// const logger = winston.createLogger({
-//   // 인스턴스 생성 필요
-//   transports: [
-//     new winston.transports.Console({
-//       level: "info",                    // level: 출력할 단계 한계 지정
-//       format: winston.format.combine(
-//         winston.format.colorize(),
-//         winston.format.timestamp({
-//           format: "YYYY-MM-DD HH:mm:dd"
-//         }),
-//         winston.format.simple()
-//         ),
-//     })
-//   ]
-// })
+logger.stream = {
+  write: (message) => logger.info(message),
+};
 
 module.exports = logger;

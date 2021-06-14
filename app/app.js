@@ -3,8 +3,9 @@
 // 모듈
 const bodyParser = require("body-parser");  // TP middleware
 const express = require("express");         // framework
-const dotenv = require("dotenv");
-const morgan = require("morgan");
+const dotenv = require("dotenv");           // 환경변수 사용
+const morgan = require("morgan");           // 로깅
+const logger = require("./src/config/logger");
 
 
 
@@ -12,7 +13,7 @@ const morgan = require("morgan");
 const app = express();
 dotenv.config();                            // process.env.환경변수 에 등록
 
-const accessLogStream = require("./src/config/log");
+// const accessLogStream = require("./src/config/log");
 
 // 라우팅
 const home = require("./src/routes/home");  // index.js를 통해 여러 모듈을 한 번에 불러오기 가능
@@ -40,7 +41,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(morgan("dev"));
 // app.use(morgan("common", { stream: accessLogStream }));   // dev: 개발 모드, stream: 데이터가 이동하는 연결 통로
 
-// winston
+// winston & morgan
+app.use(morgan("tiny", { stream: logger.stream }));
 
 
 // "/"로 시작하는 주소들에서 미들웨어 home을 적용
