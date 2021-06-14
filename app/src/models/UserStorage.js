@@ -1,6 +1,6 @@
 "use strict";
 
-const fs = require("fs").promises;
+const db = require("../config/db");
 
 class UserStorage {
   // 서버 데이터
@@ -34,34 +34,31 @@ class UserStorage {
 
   // 은닉화 된 변수를 메소드로 전달 함
   static getUsers(isAll, ...fields) {
-    return fs               // 프로미스로 반환
-    .readFile("./src/databases/users.json")
-    .then((data) => {
-      return this.#getUsers(data, isAll, fields);
-    })
-    .catch(console.error);
+
   };
 
+  // 보안을 위해서 id=?, [id] 사용함
+  // 데이터 읽기 성공/실패 확인을 위해 promise를 사용해야함(fs는 자체적으로 있었음)
   static getUserInfo (id) {
-    return fs               // 프로미스로 반환
-    .readFile("./src/databases/users.json")
-    .then((data) => {
-      return this.#getUserInfo(data, id);
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM users WHERE id=?;";
+      db.query(query, [id],(err, data) => {
+        if (err) reject(`${err}`);
+        resolve(data[0]);
+      })
     })
-    .catch(console.error);  // catch((err) => console.error(err)) 파라미터로 넘어온 변수를 실행시키는 함수로 똑같이 넘기는 경우 생략 가능
   };
 
   static async save (userInfo) {
-    const users = await this.getUsers(true);  // true: 모든 데이터
-    if (users.id.includes(userInfo.id)) {
-      throw "이미 존재하는 아이디입니다.";    // 에러구문. 문자열 대신 Error("에러구문")으로 할 경우 object라는 이름으로 나옴
-    }
-    users.id.push(userInfo.id);
-    users.name.push(userInfo.name);
-    users.psword.push(userInfo.psword);
-    
-    fs.writeFile("./src/databases/users.json", JSON.stringify(users));
-    return { success: true};
+    return new Promise((resolve, reject) => {
+      const query = "INSERT INTO users(id, name, psword) VALUES(?, ?, ?);";
+      db.query(query,
+        [userInfo.id, userInfo.name, userInfo.psword],
+        (err) => {
+        if (err) reject(`${err}`);
+        resolve({ success: true });
+      })
+    })
   }
 };
 
